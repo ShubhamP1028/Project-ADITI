@@ -1,0 +1,53 @@
+# docker-compose.yml — SNN Leaf Guardian full-stack deployment
+# ─────────────────────────────────────────────────────────────────────────────
+# Usage:
+#   docker-compose up --build          # build & run both services
+#   docker-compose up -d               # detached mode
+#   docker-compose down                # stop & remove containers
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+
+  # ── Flask ML backend ────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: shubhamp1028/aditi-backend:latest
+    container_name: aditi-backend
+    restart: unless-stopped
+    environment:
+      - MODEL_PATH=/app/regular_spiking_model.pt
+      - FLASK_ENV=production
+    volumes:
+      # Mount the model file from the host — keeps it out of the image layer
+      - ./regular_spiking_model.pt:/app/regular_spiking_model.pt:ro
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── React/Vite frontend (nginx) ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: shubhamp1028/aditi-frontend:latest
+    container_name: aditi-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  default:
+    name: aditi-network
