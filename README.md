@@ -9,25 +9,12 @@
 
 ## 🎯 *Key Innovation*
 
-SNN + Cython = 96.2% accuracy | 9ms inference | 5x faster than CNN
-Perfect for Raspberry Pi edge deployment
-
-
-## ✨ **LIVE Now** ✅
-- **React + TypeScript UI**: Home, Workflow, Disease Library, References [Screenshots](screenshots/)
-- **Node.js Backend**: Express API + PostgreSQL + Redis
-- **Docker** ready
-
-![Home](screenshots/home.png)
-![Workflow](screenshots/workflow.png)
-![Library](screenshots/library.png)
-![References](screenshots/references.png)
+SNN + CNN = 97.2% accuracy
 
 ## 🔄 **Next (Feb 2026)**
 - [ ] Cython SNN model integration
 - [ ] Real-time prediction API
 - [ ] Raspberry Pi offline deployment
-- [ ] Hindi localization
 
 ## 🚀 **Quick Start**
 ```bash
@@ -43,8 +30,8 @@ cd ../backend && npm i && npm run dev
 
 # 🛠️ Stack
 
-React 18 + TS + Tailwind | Node.js + Express + PostgreSQL
-PyTorch SNN + Cython (WIP) | Docker + Kubernetes
+React 18 + TS + Tailwind | Flask
+PyTorch CNN-SNN + Cython (WIP) | Docker + Jenkins + Kubernetes
 
 #📚 Research
 
