@@ -23,9 +23,10 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 from labels import CLASS_NAMES, DISEASE_INFO
+from model import PlantDiseaseSNN, RS_PARAMS
 
 # ─────────────────────────── Configuration ──────────────────────────────────
-IMG_SIZE = 224           # must match training resize
+IMG_SIZE = 128           # must match training resize (trained on 128×128)
 
 # Resolve paths relative to this file so the app works no matter which
 # directory you launch it from (e.g. `cd backend && python app.py` or
@@ -35,7 +36,7 @@ _PROJECT_ROOT = _HERE.parent
 
 MODEL_PATH = os.environ.get(
     "MODEL_PATH",
-    str(_PROJECT_ROOT / "../regular_spiking_model.pt")
+    str(_PROJECT_ROOT / "regular_spiking_model.pt")
 )
 MAX_CONTENT_LENGTH = 20 * 1024 * 1024   # 20 MB
 FRONTEND_DIST = os.environ.get(
@@ -81,8 +82,24 @@ def load_model():
     global model, model_loaded
     try:
         logger.info("Loading model from: %s", MODEL_PATH)
-        # weights_only=False is required for models saved with torch.save(model, path)
-        model = torch.load(MODEL_PATH, map_location=device, weights_only=False)
+        checkpoint = torch.load(MODEL_PATH, map_location=device, weights_only=False)
+
+        if isinstance(checkpoint, dict):
+            # Current .pt is a state_dict — reconstruct architecture and load weights
+            m = PlantDiseaseSNN(
+                neuron_params=RS_PARAMS,
+                num_classes=len(CLASS_NAMES),
+                feature_dim=512,
+                snn_hidden=256,
+                T=8,
+                name="Regular_Spiking",
+            )
+            m.load_state_dict(checkpoint)
+            model = m.to(device)
+        else:
+            # Full model object (after replacement)
+            model = checkpoint.to(device)
+
         model.eval()
         model_loaded = True
         logger.info("Model loaded successfully — %d output classes", len(CLASS_NAMES))
