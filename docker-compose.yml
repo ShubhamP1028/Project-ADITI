@@ -25,7 +25,7 @@ services:
       # Mount the model file from the host — keeps it out of the image layer
       - ./regular_spiking_model.pt:/app/regular_spiking_model.pt:ro
     ports:
-      - "5000:5000"
+      - "1028:1028"
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/health')"]

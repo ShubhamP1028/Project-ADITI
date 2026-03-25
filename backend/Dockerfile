@@ -22,10 +22,10 @@ COPY app.py labels.py ./
 # MODEL_PATH env var can override the default location
 ENV MODEL_PATH=/app/regular_spiking_model.pt
 
-EXPOSE 5000
+EXPOSE 1028
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/health')" || exit 1
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:1028/api/health')" || exit 1
 
 # 2 workers, 120 s timeout for slow first inference
-CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:5000", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:1028", "--timeout", "120", "app:app"]
